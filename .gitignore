@@ -46,6 +46,7 @@ coverage.xml
 *.cover
 .hypothesis/
 .pytest_cache/
+__snapshots__
 
 # Translations
 *.mo
@@ -107,4 +108,3 @@ tdd3/
 # ide
 .idea/
 .vscode/
-

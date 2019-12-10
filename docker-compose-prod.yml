@@ -14,8 +14,8 @@ services:
   user-service:
     container_name: user-service
     build: ./
-    volumes:
-      - ".:/usr/src/app"
+#    volumes:
+#      - ".:/usr/src/app"
     expose:
       - "5000"
     environment:
