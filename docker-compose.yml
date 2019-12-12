@@ -1,21 +1,21 @@
-version: "2.1"
+version: "3.3"
 
 services:
   users-db:
     container_name: users-db
-    build: ./project/db
+    build: ./services/users/project/db
     ports:
       - 3307:3306
     environment:
       - MYSQL_ROOT_PASSWORD=root321
-    healthcheck:
-      test: exit 0
 
   user-service:
     container_name: user-service
-    build: ./
+    build:
+      context: ./services/users
+      dockerfile: Dockerfile
     volumes:
-      - ".:/usr/src/app"
+      - "./services/users:/usr/src/app"
     ports:
       - 5001:5000
     environment:
@@ -23,8 +23,34 @@ services:
       - DATABASE_URL=mysql+pymysql://root:root321@users-db:3306/users_dev
       - DATABASE_TEST_URL=mysql+pymysql://root:root321@users-db:3306/users_test
     depends_on:
-      users-db:
-        condition: service_healthy
+      - users-db
     links:
       - users-db
-    command: gunicorn -b 0.0.0.0:5000 manage:app
+
+  client:
+    container_name: client
+    build:
+      context: ./services/client
+      dockerfile: Dockerfile-dev
+    volumes:
+      - './services/client:/usr/src/app'
+    ports:
+      - '3007:3000'
+    environment:
+      - NODE_ENV=development
+      - REACT_APP_USERS_SERVICE_URL=${REACT_APP_USERS_SERVICE_URL}
+    depends_on:
+      - user-service
+    links:
+      - user-service
+  nginx:
+    container_name: nginx
+    build: ./services/nginx
+    restart: always
+    ports:
+      - 8080:80
+    depends_on:
+      - user-service
+      - client
+    links:
+      - user-service

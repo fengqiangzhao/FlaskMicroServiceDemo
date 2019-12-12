@@ -6,7 +6,7 @@ from sqlalchemy import exc
 user_blueprint = Blueprint('user', __name__)
 
 
-@user_blueprint.route('/ping', methods=['GET'])
+@user_blueprint.route('/', methods=['GET'])
 def ping_ping():
     return jsonify({'status': 'success', 'message': 'pong!'})
 
